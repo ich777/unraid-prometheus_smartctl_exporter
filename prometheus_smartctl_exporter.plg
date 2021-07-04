@@ -1,0 +1,109 @@
+<?xml version='1.0' standalone='yes'?>
+<!DOCTYPE PLUGIN [
+  <!ENTITY name      "prometheus_smartctl_exporter">
+  <!ENTITY author    "ich777">
+  <!ENTITY version   "2021.07.04">
+  <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;/raw/master">
+  <!ENTITY pluginURL "&gitURL;/&name;.plg">
+  <!ENTITY md5       "1c7f9a34c5abd6e7cbf8e523cc6bb594">
+  <!ENTITY plugin    "/boot/config/plugins/&name;">
+  <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
+]>
+
+<PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0" support="https://forums.unraid.net/topic/110995-plugin-prometheus-unraid-plugins/" icon="fa-medkit">
+
+<CHANGES>
+
+###2021.07.04
+- Initial release
+
+</CHANGES>
+
+<FILE Run="/bin/bash">
+<INLINE>
+rm -f $(ls /boot/config/plugins/&name;/&name;*.tgz 2>/dev/null|grep -v '&version;')
+</INLINE>
+</FILE>
+
+<FILE Name="/boot/config/plugins/&name;/&name;-&version;.tgz" Run="upgradepkg --install-new">
+<URL>&gitURL;/packages/&name;-&version;.tgz</URL>
+<MD5>&md5;</MD5>
+</FILE>
+
+<FILE Name="&emhttp;/README.md">
+<INLINE>
+**Prometheus smartctl Exporter**
+
+Is a slim plugin, that takes informations gathered form your unRAID disks via smartctl and provides it to a Prometheus database via the Prometheus Node Exporter plugin.  
+ATTENTION: This plugin needs the Prometheus Node Exporter plugin installed to work properly and will provide the data from your disks through it.  
+This Plugin is based on: https://github.com/micha37-martins/S.M.A.R.T-disk-monitoring-for-Prometheus
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash">
+<INLINE>
+
+# Check if Prometheus Node Exporter is installed, if not cancle installation
+if [ ! -d /boot/config/plugins/prometheus_node_exporter ]; then
+  echo "---Prometheus Node Exporter not found, aborting installation!---"
+  removepkg &name;-&version;
+  exit 1
+else
+  echo "---Prometheus Node Exporter found, continuing!---"
+fi
+
+# Create settings file if not found
+if [ ! -f "&plugin;/settings.cfg" ]; then
+  echo 'interval=2m' > "&plugin;/settings.cfg"
+fi
+
+# Create temporary directory for export
+if [ ! -d "/tmp/prom_export" ]; then
+  mkdir -p /tmp/prom_export
+fi
+
+# Check if settings file for Prometheus Node Export is already patched
+NODE_SETTINGS="$(cat /boot/config/plugins/prometheus_node_exporter/settings.cfg | cut -d '=' -f2-)"
+if [ ! "$(echo ${NODE_SETTINGS} | grep "collector.textfile.director")" ]; then
+  if [ -z "{NODES_SETTINGS}" ]; then
+    sed -i 's/=/&--collector.textfile.directory=\/tmp\/prom_export/ ' /boot/config/plugins/prometheus_node_exporter/settings.cfg
+  else 
+    sed -i 's/$/ \-\-collector.textfile.directory=\/tmp\/prom_export/' /boot/config/plugins/prometheus_node_exporter/settings.cfg
+  fi
+  kill $(pidof prometheus_node_exporter) 2>/dev/null
+  sleep 1
+  prometheus_node_exporter "$(cat /boot/config/plugins/prometheus_node_exporter/settings.cfg | cut -d '=' -f2-)"
+fi
+
+# Start Exporter
+echo "---Starting Prometheus smartctl Exporter---"
+INTERVAL="$(cat "&plugin;/settings.cfg" | cut -d '=' -f2-)"
+echo "&emhttp;/smartctl_exporter.sh ${INTERVAL} 2>/dev/null" | at now
+
+</INLINE>
+</FILE>
+
+<FILE Run="/bin/bash" Method="remove">
+<INLINE>
+
+echo "-----------------------------------------------"
+echo "---Uninstalling prometheus_smartctl_exporter---"
+echo "-----------------------------------------------"
+# Remove plugin related files
+kill $(pgrep -f smartctl_exporter.sh) 2>/dev/null
+sed -i 's/--collector.textfile.directory=\/tmp\/prom_export//g' /boot/config/plugins/prometheus_node_exporter/settings.cfg
+kill $(pidof prometheus_node_exporter) 2>/dev/null
+sleep 1
+prometheus_node_exporter "$(cat /boot/config/plugins/prometheus_node_exporter/settings.cfg | cut -d '=' -f2-)"
+removepkg &name;-&version;
+rm -rf /usr/local/emhttp/plugins/&name;
+rm -rf &plugin;
+echo
+echo "--------------------------------------------------------------"
+echo "---Uninstallation of prometheus_smartctl_exporter complete!---"
+echo "--------------------------------------------------------------"
+echo
+
+</INLINE>
+</FILE>
+</PLUGIN>
