@@ -72,7 +72,7 @@ if [ ! "$(echo ${NODE_SETTINGS} | grep "collector.textfile.director")" ]; then
   fi
   kill $(pidof prometheus_node_exporter) 2>/dev/null
   sleep 1
-  prometheus_node_exporter "$(cat /boot/config/plugins/prometheus_node_exporter/settings.cfg | cut -d '=' -f2-)"
+  prometheus_node_exporter $(cat /boot/config/plugins/prometheus_node_exporter/settings.cfg | cut -d '=' -f2-)
 fi
 
 # Start Exporter
