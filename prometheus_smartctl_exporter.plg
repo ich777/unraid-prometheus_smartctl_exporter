@@ -92,12 +92,12 @@ echo "-----------------------------------------------"
 # Remove plugin related files
 kill $(pgrep -f smartctl_exporter.sh) 2>/dev/null
 sed -i 's/--collector.textfile.directory=\/tmp\/prom_export//g' /boot/config/plugins/prometheus_node_exporter/settings.cfg
-kill $(pidof prometheus_node_exporter) 2>/dev/null
-sleep 1
-prometheus_node_exporter "$(cat /boot/config/plugins/prometheus_node_exporter/settings.cfg | cut -d '=' -f2-)"
 removepkg &name;-&version;
 rm -rf /usr/local/emhttp/plugins/&name;
 rm -rf &plugin;
+kill $(pidof prometheus_node_exporter) 2>/dev/null
+sleep 1
+prometheus_node_exporter "$(cat /boot/config/plugins/prometheus_node_exporter/settings.cfg | cut -d '=' -f2-)"
 echo
 echo "--------------------------------------------------------------"
 echo "---Uninstallation of prometheus_smartctl_exporter complete!---"
