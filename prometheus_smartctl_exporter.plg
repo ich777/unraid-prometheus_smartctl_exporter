@@ -102,9 +102,6 @@ sed -i 's/--collector.textfile.directory=\/tmp\/prom_export//g' /boot/config/plu
 removepkg &name;-&version;
 rm -rf /usr/local/emhttp/plugins/&name;
 rm -rf &plugin;
-kill $(pidof prometheus_node_exporter) 2>/dev/null
-sleep 1
-echo "/usr/bin/prometheus_node_exporter $(cat /boot/config/plugins/prometheus_node_exporter/settings.cfg | cut -d '=' -f2-)" | at now
 echo
 echo "--------------------------------------------------------------"
 echo "---Uninstallation of prometheus_smartctl_exporter complete!---"
