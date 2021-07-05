@@ -79,7 +79,7 @@ if [ ! "$(echo ${NODE_SETTINGS} | grep "collector.textfile.director")" ]; then
 fi
 
 # Start Exporter
-if [ "$(pgrep -f smartctl_exporter.sh)" ]; then
+if [ ! -z "$(pgrep -f smartctl_exporter.sh)" ]; then
   echo "---Prometheus smartctl Exporter already started!---"
 else
   echo "---Starting Prometheus smartctl Exporter---"
