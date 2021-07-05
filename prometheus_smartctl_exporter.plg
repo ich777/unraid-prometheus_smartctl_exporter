@@ -2,10 +2,10 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "prometheus_smartctl_exporter">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2021.07.04">
+  <!ENTITY version   "2021.07.05">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "1c7f9a34c5abd6e7cbf8e523cc6bb594">
+  <!ENTITY md5       "e427e1a40b8b38812353452d78f99497">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -13,6 +13,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0" support="https://forums.unraid.net/topic/110995-plugin-prometheus-unraid-plugins/" icon="fa-medkit">
 
 <CHANGES>
+
+###2021.07.05
+- Updated package
 
 ###2021.07.04
 - Initial release
