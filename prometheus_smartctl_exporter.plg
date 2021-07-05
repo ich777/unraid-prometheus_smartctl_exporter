@@ -79,9 +79,13 @@ if [ ! "$(echo ${NODE_SETTINGS} | grep "collector.textfile.director")" ]; then
 fi
 
 # Start Exporter
-echo "---Starting Prometheus smartctl Exporter---"
-INTERVAL="$(cat "&plugin;/settings.cfg" | cut -d '=' -f2-)"
-echo "&emhttp;/smartctl_exporter.sh ${INTERVAL} 2>/dev/null" | at now
+if [ "$(pgrep -f smartctl_exporter.sh)" ]; then
+  echo "---Prometheus smartctl Exporter already started!---"
+else
+  echo "---Starting Prometheus smartctl Exporter---"
+  INTERVAL="$(cat "&plugin;/settings.cfg" | cut -d '=' -f2-)"
+  echo "&emhttp;/smartctl_exporter.sh ${INTERVAL} 2>/dev/null" | at now
+fi
 
 </INLINE>
 </FILE>
