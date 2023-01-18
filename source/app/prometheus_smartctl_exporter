@@ -129,6 +129,8 @@ parse_smartctl_nvme_attributes() {
     Available_Spare) available_spare="$(echo ${attr_value} | awk '{ printf "%d\n", $1 }')" ;;
     Available_Spare_Threshold) available_spare_threshold="$(echo ${attr_value} | awk '{ printf "%d\n", $1 }')" ;;
     Media_and_Data_Integrity_Errors) media_and_data_integrity_errors="$(echo ${attr_value} | awk '{ printf "%d\n", $1 }')" ;;
+    Data_Units_Read) data_units_read=$(echo $attr_value | cut -f1 -d" " | tr -dc "0-9" | awk '{ printf "%d\n", $1 }') ;;
+    Data_Units_Written) data_units_written=$(echo $attr_value | cut -f1 -d" " | tr -dc "0-9" | awk '{ printf "%d\n", $1 }') ;;
     esac
   done
 
@@ -146,6 +148,8 @@ parse_smartctl_nvme_attributes() {
   [ ! -z "$available_spare" ] && echo "available_spare_raw_value{${labels},smart_id=\"255\"} ${available_spare}"
   [ ! -z "$available_spare_threshold" ] && echo "available_spare_threshold{${labels},smart_id=\"255\"} ${available_spare_threshold}"
   [ ! -z "$media_and_data_integrity_errors" ] && echo "media_and_data_integrity_errors_count_raw_value{${labels},smart_id=\"255\"} ${media_and_data_integrity_errors}"
+  [ ! -z "$data_units_read" ] && echo "data_units_read_raw_value{${labels},smart_id=\"255\"} ${data_units_read}"
+  [ ! -z "$data_units_written" ] && echo "data_units_written_raw_value{${labels},smart_id=\"255\"} ${data_units_written}"
 }
 
 parse_smartctl_info() {
@@ -157,6 +161,7 @@ parse_smartctl_info() {
     info_value="$(echo "${line}" | cut -f2- -d: | sed 's/^ \+//g' | sed 's/"/\\"/')"
     case "${info_type}" in
     Model_Family) model_family="${info_value}" ;;
+    Model_Number) model_number="${info_value}" ;;
     Device_Model) device_model="${info_value}" ;;
     Serial_Number) serial_number="${info_value}" ;;
     Firmware_Version) fw_version="${info_value}" ;;
@@ -182,7 +187,7 @@ parse_smartctl_info() {
       esac
     fi
   done
-  echo "device_info{disk=\"${disk}\",type=\"${disk_type}\",vendor=\"${vendor}\",product=\"${product}\",revision=\"${revision}\",lun_id=\"${lun_id}\",model_family=\"${model_family}\",device_model=\"${device_model}\",serial_number=\"${serial_number}\",firmware_version=\"${fw_version}\"} 1"
+  echo "device_info{disk=\"${disk}\",type=\"${disk_type}\",vendor=\"${vendor}\",product=\"${product}\",revision=\"${revision}\",lun_id=\"${lun_id}\",model_family=\"${model_family}\",model_number=\"${model_number}\",device_model=\"${device_model}\",serial_number=\"${serial_number}\",firmware_version=\"${fw_version}\"} 1"
   echo "device_smart_available{disk=\"${disk}\",type=\"${disk_type}\"} ${smart_available}"
   echo "device_smart_enabled{disk=\"${disk}\",type=\"${disk_type}\"} ${smart_enabled}"
   echo "device_smart_healthy{disk=\"${disk}\",type=\"${disk_type}\"} ${smart_healthy}"
