@@ -2,10 +2,10 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "prometheus_smartctl_exporter">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2021.07.05">
+  <!ENTITY version   "2023.01.18">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
-  <!ENTITY md5       "5f05ca74d297bfea8ea08395f4472a18">
+  <!ENTITY md5       "9e58d03ea26515333a7816cf74da6fe9">
   <!ENTITY plugin    "/boot/config/plugins/&name;">
   <!ENTITY emhttp    "/usr/local/emhttp/plugins/&name;">
 ]>
@@ -13,6 +13,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0" support="https://forums.unraid.net/topic/110995-plugin-prometheus-unraid-plugins/" icon="fa-medkit">
 
 <CHANGES>
+
+###2023.01.18
+- Added more metrics for NVME drives - thank you strayer from the Forums
 
 ###2021.07.05
 - Updated package
