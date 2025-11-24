@@ -2,7 +2,7 @@
 <!DOCTYPE PLUGIN [
   <!ENTITY name      "prometheus_smartctl_exporter">
   <!ENTITY author    "ich777">
-  <!ENTITY version   "2023.02.26">
+  <!ENTITY version   "2025.11.24">
   <!ENTITY gitURL    "https://github.com/&author;/unraid-&name;/raw/master">
   <!ENTITY pluginURL "&gitURL;/&name;.plg">
   <!ENTITY md5       "9e58d03ea26515333a7816cf74da6fe9">
@@ -13,6 +13,9 @@
 <PLUGIN  name="&name;" author="&author;" version="&version;" pluginURL="&pluginURL;" min="6.9.0" support="https://forums.unraid.net/topic/110995-plugin-prometheus-unraid-plugins/" icon="fa-medkit">
 
 <CHANGES>
+
+###2025.11.24
+- Bugfix in plugin file - thank you SebHeuze
 
 ###2023.02.26
 - Bugfix in plugin file - thank you glennbrown from the Forums
@@ -86,7 +89,7 @@ fi
 
 # Start Exporter
 
-if [ ! -z "$(ps -fu root | grep "smartctl_exporter.sh" | grep -v "grep" | awk '{print $2}')" ]; then
+if [ ! -z "$(pgrep --ns $$ -f "&emhttp;/smartctl_exporter.sh")" ]; then
   echo "---Prometheus smartctl Exporter already started!---"
 else
   echo "---Starting Prometheus smartctl Exporter---"
@@ -104,7 +107,7 @@ echo "-----------------------------------------------"
 echo "---Uninstalling prometheus_smartctl_exporter---"
 echo "-----------------------------------------------"
 # Remove plugin related files
-kill $(ps -fu root | grep "smartctl_exporter.sh" | grep -v "grep" | awk '{print $2}')
+kill $(pgrep --ns $$ -f "&emhttp;/smartctl_exporter.sh") 2>/dev/null
 sed -i 's/--collector.textfile.directory=\/tmp\/prom_export//g' /boot/config/plugins/prometheus_node_exporter/settings.cfg
 removepkg &name;-&version;
 rm -rf /usr/local/emhttp/plugins/&name;
